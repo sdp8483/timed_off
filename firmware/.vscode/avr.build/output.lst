@@ -11,7 +11,7 @@ __vectors():
    4:	10 c0       	rjmp	.+32     	; 0x26 <__bad_interrupt>
    6:	0f c0       	rjmp	.+30     	; 0x26 <__bad_interrupt>
    8:	0e c0       	rjmp	.+28     	; 0x26 <__bad_interrupt>
-   a:	0d c0       	rjmp	.+26     	; 0x26 <__bad_interrupt>
+   a:	0e c0       	rjmp	.+28     	; 0x28 <__vector_5>
    c:	0c c0       	rjmp	.+24     	; 0x26 <__bad_interrupt>
    e:	0b c0       	rjmp	.+22     	; 0x26 <__bad_interrupt>
   10:	0a c0       	rjmp	.+20     	; 0x26 <__bad_interrupt>
@@ -26,40 +26,56 @@ __trampolines_start():
   1c:	d0 e0       	ldi	r29, 0x00	; 0
   1e:	de bf       	out	0x3e, r29	; 62
   20:	cd bf       	out	0x3d, r28	; 61
-  22:	02 d0       	rcall	.+4      	; 0x28 <main>
-  24:	15 c0       	rjmp	.+42     	; 0x50 <_exit>
+  22:	13 d0       	rcall	.+38     	; 0x4a <main>
+  24:	22 c0       	rjmp	.+68     	; 0x6a <_exit>
 
 00000026 <__bad_interrupt>:
 __vector_1():
   26:	ec cf       	rjmp	.-40     	; 0x0 <__vectors>
 
-00000028 <main>:
+00000028 <__vector_5>:
+__vector_5():
+  28:	4f 93       	push	r20
+  2a:	4f b7       	in	r20, 0x3f	; 63
+  2c:	4f 93       	push	r20
+  2e:	5f 93       	push	r21
+  30:	42 b1       	in	r20, 0x02	; 2
+  32:	51 e0       	ldi	r21, 0x01	; 1
+  34:	45 27       	eor	r20, r21
+  36:	42 b9       	out	0x02, r20	; 2
+  38:	42 b1       	in	r20, 0x02	; 2
+  3a:	52 e0       	ldi	r21, 0x02	; 2
+  3c:	45 27       	eor	r20, r21
+  3e:	42 b9       	out	0x02, r20	; 2
+  40:	5f 91       	pop	r21
+  42:	4f 91       	pop	r20
+  44:	4f bf       	out	0x3f, r20	; 63
+  46:	4f 91       	pop	r20
+  48:	18 95       	reti
+
+0000004a <main>:
 main():
-  28:	08 9a       	sbi	0x01, 0	; 1
-  2a:	09 9a       	sbi	0x01, 1	; 1
-  2c:	10 9a       	sbi	0x02, 0	; 2
-  2e:	11 9a       	sbi	0x02, 1	; 2
-  30:	4f ef       	ldi	r20, 0xFF	; 255
-  32:	5a e1       	ldi	r21, 0x1A	; 26
-  34:	67 eb       	ldi	r22, 0xB7	; 183
-  36:	41 50       	subi	r20, 0x01	; 1
-  38:	50 40       	sbci	r21, 0x00	; 0
-  3a:	60 40       	sbci	r22, 0x00	; 0
-  3c:	e1 f7       	brne	.-8      	; 0x36 <main+0xe>
-  3e:	00 c0       	rjmp	.+0      	; 0x40 <__SREG__+0x1>
-  40:	00 00       	nop
-  42:	10 98       	cbi	0x02, 0	; 2
-  44:	11 98       	cbi	0x02, 1	; 2
-  46:	4a b7       	in	r20, 0x3a	; 58
-  48:	41 7f       	andi	r20, 0xF1	; 241
-  4a:	44 60       	ori	r20, 0x04	; 4
-  4c:	4a bf       	out	0x3a, r20	; 58
-  4e:	ff cf       	rjmp	.-2      	; 0x4e <__SREG__+0xf>
+  4a:	08 9a       	sbi	0x01, 0	; 1
+  4c:	09 9a       	sbi	0x01, 1	; 1
+  4e:	1e bd       	out	0x2e, r17	; 46
+  50:	4d e0       	ldi	r20, 0x0D	; 13
+  52:	4d bd       	out	0x2d, r20	; 45
+  54:	44 ee       	ldi	r20, 0xE4	; 228
+  56:	47 bd       	out	0x27, r20	; 39
+  58:	42 ee       	ldi	r20, 0xE2	; 226
+  5a:	46 bd       	out	0x26, r20	; 38
+  5c:	19 bd       	out	0x29, r17	; 41
+  5e:	18 bd       	out	0x28, r17	; 40
+  60:	4b b5       	in	r20, 0x2b	; 43
+  62:	42 60       	ori	r20, 0x02	; 2
+  64:	4b bd       	out	0x2b, r20	; 43
+  66:	78 94       	sei
+  68:	ff cf       	rjmp	.-2      	; 0x68 <__stack+0x9>
 
-00000050 <_exit>:
+0000006a <_exit>:
 exit():
-  50:	f8 94       	cli
+  6a:	f8 94       	cli
 
-00000052 <__stop_program>:
+0000006c <__stop_program>:
 __stop_program():
-  52:	ff cf       	rjmp	.-2      	; 0x52 <__stop_program>
+  6c:	ff cf       	rjmp	.-2      	; 0x6c <__stop_program>
