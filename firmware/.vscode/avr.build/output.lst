@@ -1,0 +1,65 @@
+
+.vscode/avr.build/output.elf:     file format elf32-avr
+
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+__vectors():
+   0:	0a c0       	rjmp	.+20     	; 0x16 <__ctors_end>
+   2:	11 c0       	rjmp	.+34     	; 0x26 <__bad_interrupt>
+   4:	10 c0       	rjmp	.+32     	; 0x26 <__bad_interrupt>
+   6:	0f c0       	rjmp	.+30     	; 0x26 <__bad_interrupt>
+   8:	0e c0       	rjmp	.+28     	; 0x26 <__bad_interrupt>
+   a:	0d c0       	rjmp	.+26     	; 0x26 <__bad_interrupt>
+   c:	0c c0       	rjmp	.+24     	; 0x26 <__bad_interrupt>
+   e:	0b c0       	rjmp	.+22     	; 0x26 <__bad_interrupt>
+  10:	0a c0       	rjmp	.+20     	; 0x26 <__bad_interrupt>
+  12:	09 c0       	rjmp	.+18     	; 0x26 <__bad_interrupt>
+  14:	08 c0       	rjmp	.+16     	; 0x26 <__bad_interrupt>
+
+00000016 <__ctors_end>:
+__trampolines_start():
+  16:	11 27       	eor	r17, r17
+  18:	1f bf       	out	0x3f, r17	; 63
+  1a:	cf e5       	ldi	r28, 0x5F	; 95
+  1c:	d0 e0       	ldi	r29, 0x00	; 0
+  1e:	de bf       	out	0x3e, r29	; 62
+  20:	cd bf       	out	0x3d, r28	; 61
+  22:	02 d0       	rcall	.+4      	; 0x28 <main>
+  24:	15 c0       	rjmp	.+42     	; 0x50 <_exit>
+
+00000026 <__bad_interrupt>:
+__vector_1():
+  26:	ec cf       	rjmp	.-40     	; 0x0 <__vectors>
+
+00000028 <main>:
+main():
+  28:	08 9a       	sbi	0x01, 0	; 1
+  2a:	09 9a       	sbi	0x01, 1	; 1
+  2c:	10 9a       	sbi	0x02, 0	; 2
+  2e:	11 9a       	sbi	0x02, 1	; 2
+  30:	4f ef       	ldi	r20, 0xFF	; 255
+  32:	5a e1       	ldi	r21, 0x1A	; 26
+  34:	67 eb       	ldi	r22, 0xB7	; 183
+  36:	41 50       	subi	r20, 0x01	; 1
+  38:	50 40       	sbci	r21, 0x00	; 0
+  3a:	60 40       	sbci	r22, 0x00	; 0
+  3c:	e1 f7       	brne	.-8      	; 0x36 <main+0xe>
+  3e:	00 c0       	rjmp	.+0      	; 0x40 <__SREG__+0x1>
+  40:	00 00       	nop
+  42:	10 98       	cbi	0x02, 0	; 2
+  44:	11 98       	cbi	0x02, 1	; 2
+  46:	4a b7       	in	r20, 0x3a	; 58
+  48:	41 7f       	andi	r20, 0xF1	; 241
+  4a:	44 60       	ori	r20, 0x04	; 4
+  4c:	4a bf       	out	0x3a, r20	; 58
+  4e:	ff cf       	rjmp	.-2      	; 0x4e <__SREG__+0xf>
+
+00000050 <_exit>:
+exit():
+  50:	f8 94       	cli
+
+00000052 <__stop_program>:
+__stop_program():
+  52:	ff cf       	rjmp	.-2      	; 0x52 <__stop_program>
