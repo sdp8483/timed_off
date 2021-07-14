@@ -353,9 +353,9 @@ Text Notes 6000 4900 0    50   ~ 0
 PB3
 Text Notes 6200 4900 0    50   ~ 0
 T
-Text Notes 5800 5000 0    50   ~ 0
+Text Notes 5800 5300 0    50   ~ 0
 H
-Text Notes 6000 5000 0    50   ~ 0
+Text Notes 6000 5300 0    50   ~ 0
 H
 Text Notes 6200 5000 0    50   ~ 0
 30min
@@ -364,19 +364,19 @@ H
 Text Notes 6000 5100 0    50   ~ 0
 L
 Text Notes 6200 5100 0    50   ~ 0
-3hrs
+1hr
 Text Notes 5800 5200 0    50   ~ 0
 L
 Text Notes 6000 5200 0    50   ~ 0
 H
 Text Notes 6200 5200 0    50   ~ 0
-1hr
-Text Notes 5800 5300 0    50   ~ 0
+2hrs
+Text Notes 5800 5000 0    50   ~ 0
 L
-Text Notes 6000 5300 0    50   ~ 0
+Text Notes 6000 5000 0    50   ~ 0
 L
 Text Notes 6200 5300 0    50   ~ 0
-x
+3hrs
 Wire Notes Line style solid
 	5800 5300 6450 5300
 Wire Notes Line style solid

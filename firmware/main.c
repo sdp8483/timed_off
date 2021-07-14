@@ -7,8 +7,8 @@
  *       ---------
  *   3v | 5  1 PB0| -> SSR
  *   GND| 2  3 PB1| -> LED
- *      |    4 PB2|
- *      |    6 PB3|
+ *      |    4 PB2| <- Resistor
+ *      |    6 PB3| <- Resistor
  *       ---------
  *        SOT23-6
  * write fuse:
@@ -30,45 +30,70 @@
 
 #include "main.h"
 
-#define TIMEOUT_MINUTES     1UL  /* timeout after X minutes */
-#define TIMPUT_ms           (TIMEOUT_MINUTES * 60UL * 1000UL)
+#define DELAY_ON_START_ms   5000    /* delay before turning on SSR on first power */
 
-/* Timer0 1Hz Tick */
-#define TIMER_PRELOAD   (58594) /* with precaler of 1024 on Timer0, 58,594 is ~60s when sys clock is 1MHz */
-//#define TIMER_PRELOAD   (7500) /* with a prescaler of 1024 on Timer0, 7,500 is ~60s when sys clock is 128kHz */
+/* timeout settings */
+#define TIMEOUT_0           30      /* timeout after X minutes, option 0 */
+#define TIMEOUT_1           60      /* timeout after X minutes, option 1 */
+#define TIMEOUT_2           120     /* timeout after X minutes, option 2 */
+#define TIMEOUT_3           180     /* timeout after X minutes, option 3 */
+uint8_t t_array[] = {TIMEOUT_0, TIMEOUT_1, TIMEOUT_2, TIMEOUT_3};
 
-/* Funciton Prototypes */
+/* Timer0 60s Tick */
+#define TIMER_PRELOAD   (58594)     /* with prescaler of 1024 on Timer0, 58,594 is ~60s when sys clock is 1MHz */
+//#define TIMER_PRELOAD   (7500)      /* with a prescaler of 1024 on Timer0, 7,500 is ~60s when sys clock is 128kHz */
+
+volatile uint8_t count = 0;         /* timer0 tick count */
+
+/* Function Prototypes */
 void enableTimer0(void);
 void disableTimer0(void);
 
 int main(void) {
     /* set PB0 and PB1 as output */
-    DDRB |= BIT0;
-    DDRB |= BIT1;
+    DDRB |= (BIT0 + BIT1);
 
+    /* set PB2 and PB3 as input, pullups */
+    DDRB &= ~(BIT2 + BIT3);
+    PUEB |= (BIT2 + BIT3);
+
+    /* read PB2 and PB3 to get the timout setting */
+    uint8_t timeout = t_array[(PINB & (BIT2 + BIT3)) >> 2];
+
+    /* wait before enabling SSR to lessen current inrush */
+    _delay_ms(DELAY_ON_START_ms);
+
+    /* enable 60s timer */
     enableTimer0();
     sei();
 
-    // /* set PB0 HIGH for initial startup */
-    // SET(PORTB, 0);
-    // SET(PORTB, 1);
-    // _delay_ms(TIMPUT_ms);
+    /* enable SSR and LED */
+    PORTB |= (BIT0 + BIT1);
 
-    // /* set PB0 LOW to reset */
-    // RESET(PORTB, 0);
-    // RESET(PORTB, 1);
-
-    /* go to sleep */
-    set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-    // sleep_enable();
+    /* set sleep mode */
+    set_sleep_mode(SLEEP_MODE_IDLE);
     
-    /* should never get here */
+    while(timeout > count) {
+        sleep_enable();     /* enable sleep */
+        sleep_cpu();        /* go to sleep */
+        sleep_disable();    /* wake from sleep here on timer0 interrupt */
+    }
+
+    /* disable SSR and LED */
+    PORTB &= ~(BIT0 + BIT1);
+
+    /* disable timer0 */
+    disableTimer0();
+    
     while(1) {
-        
+        /* deep sleep with no interrupt */
+        set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+        sleep_enable();     /* enable sleep */
+        sleep_cpu();        /* go to sleep */
     }
 }
 
-/* eanble timer0 to trigger ISR for auto power off */
+/* enable timer0 to trigger ISR for auto power off */
 void enableTimer0(void) {
     TCCR0A = 0;                         /* OC0A/OC0B disconnected ie no output on pins*/
     TCCR0B = (BIT3 + BIT2 + BIT0);      /* clear timer on compare,  timer prescaler is 1024*/
@@ -91,6 +116,5 @@ void disableTimer0(void) {
 }
 
 ISR(TIM0_COMPA_vect) {
-    TOGGLE(PORTB, 0);
-    TOGGLE(PORTB, 1);
+    count++;
 }
